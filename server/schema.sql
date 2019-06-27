@@ -20,7 +20,7 @@ CREATE TABLE messages (
   /* Describe your table here.*/
   id int NOT NULL AUTO_INCREMENT,
   userid int NOT NULL,
-  text varchar(200) NOT NULL,
+  message varchar(200) NOT NULL,
   roomid int NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (userid) REFERENCES users (id),
