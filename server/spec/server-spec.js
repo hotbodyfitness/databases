@@ -12,7 +12,7 @@ describe('Persistent Node Chat Server', function() {
     dbConnection = mysql.createConnection({
       // FIXME: Do we need to change the user and password to our own user (root) and password?
       user: 'root',
-      password: '205501g',
+      password: '',
       database: 'chat'
     });
     dbConnection.connect();
