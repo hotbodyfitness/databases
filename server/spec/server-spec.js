@@ -28,7 +28,7 @@ describe('Persistent Node Chat Server', function() {
     dbConnection.end();
   });
 
-  it.only('Should insert posted messages to the DB', function(done) {
+  it('Should insert posted messages to the DB', function(done) {
     // Post the user to the chat server.
     request(
       {
