@@ -12,8 +12,8 @@ module.exports = {
           // res.status(500);
           // res.send('We got an error 500!');
         } else {
-          res.status(200);
-          res.type("json");
+          // res.status(200);
+          // res.type("json");
           res.send(JSON.stringify({ data }));
         }
       });
@@ -31,9 +31,10 @@ module.exports = {
         if (err) {
           console.log("Error from controllers.post :", err);
         } else {
-          res.status(201);
-          res.type("json");
-          res.send(JSON.stringify(data));
+          // res.status(201);
+          // res.type("json");
+          console.log("DATA :", data.message);
+          res.sendStatus(201);
         }
       });
     }
@@ -50,17 +51,15 @@ module.exports = {
           // res.status(500);
           // res.send('We got an error 500!');
         } else {
-          res.status(200);
-          res.type("json");
+          // res.status(200);
+          // res.type("json");
           res.send(JSON.stringify({ data }));
         }
       });
     },
     post: function(req, res) {
       var obj = {
-        username: req.body.username,
-        message: req.body.message,
-        roomname: req.body.roomname
+        username: req.body.username
       };
       // console.log("POST Request :", req);
       console.log("POST Request.body :", req.body);
@@ -68,9 +67,7 @@ module.exports = {
         if (err) {
           console.log("Error from controllers.post :", err);
         } else {
-          res.status(201);
-          res.type("json");
-          res.send(JSON.stringify(data));
+          res.sendStatus(201);
         }
       });
     }

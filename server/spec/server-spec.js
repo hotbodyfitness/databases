@@ -22,6 +22,8 @@ describe('Persistent Node Chat Server', function() {
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
     dbConnection.query('truncate ' + tablename, done);
+    // dbConnection.query('DELETE FROM users');
+    // dbConnection.query('DELETE FROM rooms', done);
   });
 
   afterEach(function() {
@@ -63,7 +65,7 @@ describe('Persistent Node Chat Server', function() {
               expect(results.length).to.equal(1);
 
               // TODO: If you don't have a column named text, change this test.
-              expect(results[0].text).to.equal(
+              expect(results[0].message).to.equal(
                 "In mercy's name, three days is all I need."
               );
 
@@ -77,14 +79,16 @@ describe('Persistent Node Chat Server', function() {
 
   it('Should output all messages from the DB', function(done) {
     // Let's insert a message into the db
-    var queryString = 'INSERT INTO messages (text) VALUES ()';
-    var queryArgs = ['Here is our Text'];
+    var queryString =
+      'INSERT INTO messages (message, userid, roomid) VALUES (?, (SELECT id FROM users WHERE username = ?), (SELECT id FROM rooms WHERE roomname = ?))';
+    var queryArgs = ['Here is our Text', 'Valjean', 'Hello'];
     // TODO - The exact query string and query args to use
     // here depend on the schema you design, so I'll leave
     // them up to you. */
 
-    dbConnection.query(queryString, queryArgs, function(err) {
+    dbConnection.query(queryString, queryArgs, function(err, results) {
       if (err) {
+        console.log('RESULTS ERR: ', results);
         throw err;
       }
 
@@ -96,8 +100,10 @@ describe('Persistent Node Chat Server', function() {
         body
       ) {
         var messageLog = JSON.parse(body);
-        expect(messageLog[0].text).to.equal('Men like you can never change!');
-        expect(messageLog[0].roomname).to.equal('main');
+        console.log('messageLog from TEST: ', messageLog);
+        expect(messageLog.data[0].message).to.equal('Here is our Text');
+        expect(messageLog.data[0].roomid).to.equal(1);
+
         done();
       });
     });
