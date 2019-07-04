@@ -1,4 +1,4 @@
-// var models = require("../models");
+var models = require("../models");
 var db = require("../db");
 
 // SEQUELIZE refactor Completely removes the need for Server —> Models
