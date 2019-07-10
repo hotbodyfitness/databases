@@ -8,9 +8,23 @@ module.exports = {
     get: function (req, res) { // a function which handles a get request for all messages
 
       // SEQUELIZE refactor
-      db.Messages.findAll() // .findAll({include: [User]}) would Left Outer Join the Users table {join:}(would be inner join)
-        .complete((err, data) => {
-          res.json(data); // same as = res.send(JSON.stringify({ data }))
+      db.Messages.findAll({include: [db.Rooms, db.Users]}) // .findAll({include: [User]}) would Left Outer Join the Users table {join:}(would be inner join)
+        // .complete((err, data) => {
+        //   console.log('****DATA*********from MESSAGES:GET', data);
+        //   res.json(data); // same as = res.send(JSON.stringify({ data }))
+        // });
+        .then((messages) => {
+          console.log(000000000000, messages);
+          // return messages.map((message) => {
+          //   console.log(11111111, message);
+          //   return {
+          //     username: message.Users.username,
+          //     message: message.text,
+          //     roomname: message.Rooms.roomname
+          //     // createdAt: message.createdAt,
+          //     // updatedAt: message.updatedAt
+          //   };
+          // });
         });
 
       // models.messages.get((err, data) => { // THIS BLOCK was before refactor
@@ -29,18 +43,21 @@ module.exports = {
     post: function (req, res) { // a function which handles posting a message to the database
       // SEQUELIZE refactor
       // .findOrCreate - will find the room if exists, or create it if it doesn't
-      db.Users.findOrCreate({username: req.body.username}) // access to id from USERS table
-        .complete((err, user) => {
-          db.Rooms.findOrCreate({roomname: req.body.roomname}) // access to id from ROOMS table
-            .complete((err, room) => {
+      db.Users.create({username: req.body.username}) // access to id from USERS table
+        // .complete((err, user) => {
+          .then((results) => {
+          db.Rooms.create({roomname: req.body.roomname}) // access to id from ROOMS table
+            // .complete((err, room) => {
+            .then((room) => {
               var obj = {
-                userid: user.id,
+                UserId: results.id, // user.id,
                 message: req.body.message,
-                roomid: room.id
+                RoomId: room.id
               };
-
+              console.log('****OBJECT*********from MESSAGES:POST', obj);
               db.Messages.create(obj)
-                .complete((err, data) => {
+                // .complete((err, data) => {
+                .then((data) => {
                   res.sendStatus(201);
                 });
             });
@@ -66,7 +83,9 @@ module.exports = {
     get: function (req, res) {
       // SEQUELIZE refactor
       db.Users.findAll()
-        .complete((err, data) => {
+        // .complete((err, data) => {
+        .then((data) => {
+          console.log('****DATA*********from USERS:GET', data);
           res.json(data); // same as = res.send(JSON.stringify({ data }))
         });
 
@@ -82,7 +101,9 @@ module.exports = {
     post: function (req, res) {
       // SEQUELIZE refactor
       db.Users.create({username: req.body.username})
-        .complete((err, data) => {
+        // .complete((err, data) => {
+        .then((data) => {
+          // console.log('****DATA*********from USERS:POST', data);
           res.sendStatus(201);
         });
 

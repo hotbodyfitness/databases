@@ -4,12 +4,14 @@
 
 // SEQUELIZE refactor
 var Sequelize = require('sequelize');
-var db = new Sequelize('chat', 'root', '');
+var db = new Sequelize('chat', 'root', '', {
+  define: {timestamps: false}
+});
 
 var Users = db.define('Users', {
   id: {
     type: Sequelize.INTEGER,
-    allowNull: false,
+    // allowNull: false,
     primaryKey: true,
     autoIncrement: true
   },
@@ -18,19 +20,19 @@ var Users = db.define('Users', {
 var Messages = db.define('Messages', {
   id: {
     type: Sequelize.INTEGER,
-    allowNull: false,
+    // allowNull: false,
     primaryKey: true,
     autoIncrement: true
   },
   message: Sequelize.STRING,
-  roomid: {
+  RoomId: {
     type: Sequelize.INTEGER,
     references: {
       model: 'rooms',
       key: 'id'
     }
   },
-  userid: {
+  UserId: {
     type: Sequelize.INTEGER,
     references: {
       model: 'users',
@@ -41,7 +43,7 @@ var Messages = db.define('Messages', {
 var Rooms = db.define('Rooms', {
   id: {
     type: Sequelize.INTEGER,
-    allowNull: false,
+    // allowNull: false,
     primaryKey: true,
     autoIncrement: true
   },
@@ -51,8 +53,8 @@ var Rooms = db.define('Rooms', {
 // this is how FOREIGN KEYS are defined
 Users.hasMany(Messages);
 Rooms.hasMany(Messages);
-Messages.belongsTo(Users, { foreignKey: 'userid' });
-Messages.belongsTo(Rooms, { foreignKey: 'roomid' });
+Messages.belongsTo(Users, { foreignKey: 'id' });
+Messages.belongsTo(Rooms, { foreignKey: 'id' });
 
 // Syncronize these Sequelize var's
 Users.sync();
@@ -68,10 +70,6 @@ db.authenticate()
     console.error('SEQUELIZE Unable to connect to the database:', err);
   });
 
-module.exports.Users = Users;
-module.exports.Messages = Messages;
-module.exports.Rooms = Rooms;
-
 // FOLLOWING lines were for mysql without Sequelize - no longer needed
 // var mysql = require('mysql');
 // var connection = mysql.createConnection({
@@ -81,4 +79,8 @@ module.exports.Rooms = Rooms;
 // });
 // connection.connect();
 
-// module.exports = connection;
+module.exports = {
+  Users,
+  Messages,
+  Rooms
+};

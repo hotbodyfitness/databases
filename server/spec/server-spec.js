@@ -4,14 +4,11 @@
 var mysql = require('mysql');
 var request = require('request'); // You might need to npm install the request module!
 var expect = require('chai').expect;
-var Sequelize = require('sequelize');
 
 describe('Persistent Node Chat Server', function () {
   var dbConnection;
-  var db;
 
   beforeEach(function (done) {
-    db = new Sequelize('chat', 'root', '');
 
     dbConnection = mysql.createConnection({
       // FIXME: Do we need to change the user and password to our own user (root) and password?
@@ -58,28 +55,28 @@ describe('Persistent Node Chat Server', function () {
             // Now if we look in the database, we should find the
             // posted message there.
 
-            db.query('SELECT * FROM messages')
-              .then(results => {
-                console.log('****************************', results[0]);
-                expect(results[0][0].message).to.equal(
-                  "In mercy's name, three days is all I need."
-                );
-                done();
-              });
-            // var queryString = 'SELECT * FROM messages';
-            // var queryArgs = [];
-            // dbConnection.query(queryString, queryArgs, function(err, results) {
-            //   console.log('*************** this is results', results);
-            //   // Should have one result:
-            //   expect(results.length).to.equal(1);
+            // db.query('SELECT * FROM messages')
+            //   .then(results => {
+            //     console.log('****************************', results[0]);
+            //     expect(results[0][0].message).to.equal(
+            //       "In mercy's name, three days is all I need."
+            //     );
+            //     done();
+            //   });
+            var queryString = 'SELECT * FROM messages';
+            var queryArgs = [];
+            dbConnection.query(queryString, queryArgs, function(err, results) {
+              console.log('*************** this is results', results);
+              // Should have one result:
+              expect(results.length).to.equal(1);
 
-            //   // TODO: If you don't have a column named text, change this test.
-            //   expect(results[0].message).to.equal(
-            //     "In mercy's name, three days is all I need."
-            //   );
+              // TODO: If you don't have a column named text, change this test.
+              expect(results[0].message).to.equal(
+                "In mercy's name, three days is all I need."
+              );
 
-            //   done();
-            // });
+              done();
+            });
           }
         );
       }
@@ -90,42 +87,51 @@ describe('Persistent Node Chat Server', function () {
     // Let's insert a message into the db
     // TODO - The exact query string and query args to use
 
-    var queryStr2 = 'INSERT INTO messages (message, userid, roomid) VALUES (Here is our Text, (SELECT id FROM users WHERE username = Valjean), (SELECT id FROM rooms WHERE roomname = Hello))';
-    db.query(queryStr2)
-      .then(results => {
-        console.log('RESULTS TEST 2 ****************: ', results);
-        request('http://127.0.0.1:3000/classes/messages', function (error, response, body) {
-          var messageLog = JSON.parse(body);
-          console.log('messageLog from TEST: ', messageLog);
-          expect(messageLog.data[0].message).to.equal('Here is our Text');
-          expect(messageLog.data[0].roomid).to.equal(1);
-
-          done();
-        });
-      });
-    //   var queryString =
-    //   'INSERT INTO messages (message, userid, roomid) VALUES (?, (SELECT id FROM users WHERE username = ?), (SELECT id FROM rooms WHERE roomname = ?))';
+    // var queryStr2 = 'INSERT INTO messages (message, userid, roomid) VALUES (?, (SELECT id FROM users WHERE username = ?), (SELECT id FROM rooms WHERE roomname = ?))';
     // var queryArgs = ['Here is our Text', 'Valjean', 'Hello'];
-    // dbConnection.query(queryString, queryArgs, function(err, results) {
-    //   if (err) {
-    //     console.log('RESULTS ERR from ServerSpec line 109: ', results);
-    //     throw err;
-    //   }
+    // dbConnection.query(queryStr2, queryArgs)
+    //   .then(results => {
+    //     console.log('RESULTS TEST 2 ****************: ', results);
+    //     request('http://127.0.0.1:3000/classes/messages', function (error, response, body) {
+    //       var messageLog = JSON.parse(body);
+    //       console.log('messageLog from TEST: ', messageLog);
+    //       expect(messageLog.data[0].message).to.equal('Here is our Text');
+    //       expect(messageLog.data[0].roomid).to.equal(1);
 
-    //   // Now query the Node chat server and see if it returns
-    //   // the message we just inserted:
-    //   request('http://127.0.0.1:3000/classes/messages', function(
-    //     error,
-    //     response,
-    //     body
-    //   ) {
-    //     var messageLog = JSON.parse(body);
-    //     console.log('messageLog from TEST: ', messageLog);
-    //     expect(messageLog.data[0].message).to.equal('Here is our Text');
-    //     expect(messageLog.data[0].roomid).to.equal(1);
-
-    //     done();
+    //       done();
+    //     });
     //   });
-    // });
+
+    // var queryString = 'INSERT INTO messages (message, UserId, RoomId) VALUES (?, (SELECT id FROM users WHERE username IN ?), (SELECT id FROM rooms WHERE roomname IN ?))';
+    var queryString = 'INSERT INTO messages (message, UserId, RoomId) VALUES (?, ?, ?)';
+    var queryArgs = ['Hey Zack', '1', '1'];
+    dbConnection.query(queryString, queryArgs, function(err, results) {
+      if (err) {
+        console.log('RESULTS ERR from ServerSpec line 110: ', results);
+      } else {
+        console.log('RESULTS GOOD from ServerSpec line 112: ', results);
+      }
+      // Now query the Node chat server and see if it returns
+      // the message we just inserted:
+
+      dbConnection.query('SELECT * FROM messages', [], (err, results) => {
+        // console.log('***GOT IT!!!*******', results);
+        expect(results[0].message).to.equal('Hey Zack');
+        expect(results[0].id).to.equal(1);
+        done();
+      });
+      // request('http://127.0.0.1:3000/classes/messages', function(
+      //   error,
+      //   response,
+      //   body
+      // ) {
+      //   console.log('response, body ****************: ', response, body);
+      //   var messageLog = JSON.parse(body);
+      //   console.log('messageLog from TEST: ', messageLog);
+
+
+      //   done();
+      // });
+    });
   });
 });

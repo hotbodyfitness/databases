@@ -19,12 +19,12 @@ CREATE TABLE rooms (
 CREATE TABLE messages (
   /* Describe your table here.*/
   id int NOT NULL AUTO_INCREMENT,
-  userid int NULL,
+  UserId int NULL,
   message varchar(200) NOT NULL,
-  roomid int NULL,
+  RoomId int NULL,
   PRIMARY KEY (id),
-  FOREIGN KEY (userid) REFERENCES users (id),
-  FOREIGN KEY (roomid) REFERENCES rooms (id)
+  FOREIGN KEY (UserId) REFERENCES users (id),
+  FOREIGN KEY (RoomId) REFERENCES rooms (id)
 );
 
 /* Create other tables and define schemas for them here! */
