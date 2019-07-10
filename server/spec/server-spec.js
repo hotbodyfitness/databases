@@ -108,8 +108,6 @@ describe('Persistent Node Chat Server', function () {
     dbConnection.query(queryString, queryArgs, function(err, results) {
       if (err) {
         console.log('RESULTS ERR from ServerSpec line 110: ', results);
-      } else {
-        console.log('RESULTS GOOD from ServerSpec line 112: ', results);
       }
       // Now query the Node chat server and see if it returns
       // the message we just inserted:
@@ -132,6 +130,34 @@ describe('Persistent Node Chat Server', function () {
 
       //   done();
       // });
+    });
+  });
+
+  it('Should insert a new user to the DB', function (done) {
+    var queryString = 'INSERT INTO users (username) VALUES (?)';
+    var queryArgs = ['Zack'];
+    dbConnection.query(queryString, queryArgs, function(err, results) {
+      if (err) {
+        console.log('RESULTS ERR from ServerSpec line 143: ', results);
+      }
+      dbConnection.query('SELECT username FROM users WHERE username = ?', ['Zack'], (err, results) => {
+        expect(results[0].username).to.equal('Zack');
+        done();
+      });
+    });
+  });
+
+  it('Should insert a new roomname to the DB', function (done) {
+    var queryString = 'INSERT INTO rooms (roomname) VALUES (?)';
+    var queryArgs = ['Home'];
+    dbConnection.query(queryString, queryArgs, function(err, results) {
+      if (err) {
+        console.log('RESULTS ERR from ServerSpec line 143: ', results);
+      }
+      dbConnection.query('SELECT roomname FROM rooms WHERE roomname = ?', ['Home'], (err, results) => {
+        expect(results[0].roomname).to.equal('Home');
+        done();
+      });
     });
   });
 });
